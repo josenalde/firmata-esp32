@@ -17,3 +17,5 @@ sysexResponse(commandByte, handler) {
 
    return this;
   }
+  
+  firmata.js is the file from https://github.com/firmata/firmata.js/blob/master/packages/firmata-io/lib/firmata.js with this modification.

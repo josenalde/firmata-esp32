@@ -1,23 +1,17 @@
-/*https://www.npmjs.com/package/arduino-firmata
-  fora de uso - 4 anos - 0.3.4
-
-  utilizar https://github.com/firmata/firmata.js?utm_source=recordnotfound.com
-  https://www.npmjs.com/package/firmata 2.2.0, 5 meses atrás
-  10.06.2020
-
-  npm install firmata
-  */
  /* by Josenalde Oliveira, 11.06.2020 ---- 
     sysex Commands for basic IO with ESP32 */ 
+
  const Firmata = require("firmata");
- const esp32 = new Firmata("COM5");
+ const esp32 = new Firmata("COM5"); // your port
+
 // ------- IO COMMANDS ------- //
  const PWMOUTPUT = 0x04;
  const ANALOGREAD = 0x02; 
- var pinToWrite = 18;
- var pinToRead = 32;
+ var pinToWrite = 18; // pwm (any digital pin esp32)
+ var pinToRead = 32; // adc
+
  var pwmValue, pwmChannel = 0, pwmFreq = 10, pwmResolution = 8;
- // visto que é tipo byte, pwmFreq é enviado como 5 e multiplicado por 1000 no c++
+ // since they are of byte type, pwmFreq is sent as 10 (or desired freq) and multiplied by 1000@c++ (FirmataExt.cpp)
  
   function analogWrite() {
     esp32.sysexCommand([ANALOGREAD, pinToRead]);
@@ -32,9 +26,9 @@
   }
   
   function fhandler(data) {
-     console.log(Firmata.decode(data)); // o Firmata.decode remove os zeros
-     // o valor pwmValue está retornando com 7 bits, limitado a 127
-     // o valor máximo enviado é de 8 bits, 255
+     console.log(Firmata.decode(data)); // o Firmata.decode remove zeros
+     // max pwmValue value has 7 bits, limited to 127
+     // max sent value has 8 bits, 255
   }
 
   esp32.on("ready", () => {
@@ -44,7 +38,7 @@
         // framework -> esp32 (hw firmata.h host)
         //    argv[0] = 2 (pin), argv[1] = 2 (times), argv[2] = duration
         // esp32 (hw firmata.h host) -> framework
-        //    Firmata.sendSysex(command, argc, argv) usa sendValueAsTwo7bitBytes(bytev[i]);    
+        //    Firmata.sendSysex(command, argc, argv) calls sendValueAsTwo7bitBytes(bytev[i]);    
         /*
         * Split a 16-bit byte into two 7-bit values and write each value.
         * @param value The 16-bit value to be split and written separately.

@@ -19,3 +19,7 @@ sysexResponse(commandByte, handler) {
   }
   
   firmata.js is the file from https://github.com/firmata/firmata.js/blob/master/packages/firmata-io/lib/firmata.js with this modification.
+  
+  --------------------
+  
+  Tested with Ruby arduino-firmata: https://github.com/shokai/arduino_firmata, also installed by https://rubygems.org/gems/arduino_firmata/versions/0.3.7

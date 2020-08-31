@@ -1,22 +1,23 @@
 /*https://www.npmjs.com/package/arduino-firmata
-  fora de uso - 4 anos - 0.3.4
+  out of date - 4 years - 0.3.4
 
-  utilizar https://github.com/firmata/firmata.js?utm_source=recordnotfound.com
-  https://www.npmjs.com/package/firmata 2.2.0, 5 meses atrás
+  use https://github.com/firmata/firmata.js?utm_source=recordnotfound.com
+  https://www.npmjs.com/package/firmata 2.2.0, updated
   10.06.2020
 
   npm install firmata
   */
  /* by Josenalde Oliveira, 11.06.2020 ---- 
     sysex Commands for basic IO with ESP32 */ 
+
  const Firmata = require("firmata");
- const esp32 = new Firmata("COM5");
+ const esp32 = new Firmata("COM5"); // your port
 // ------- IO COMMANDS ------- //
  const DIGITALWRITE = 0x01; 
  const ADCREAD  = 0x02;
  
  var pinState = false; //for the first iteration
- var pinToWrite = 19;
+ var pinToWrite = 19; //an example, change your pin accordingly
  
   function digitalWrite() {
     esp32.sysexCommand([DIGITALWRITE, pinToWrite, !pinState]); //command, argc, argv = data

@@ -2372,8 +2372,9 @@ class Firmata extends Emitter {
   sysexResponse(commandByte, handler) {
     //console.log('Inside sysexResponse@framework ', commandByte);
     //console.log(Firmata.SYSEX_RESPONSE[commandByte]);
-    //alterado por Josenalde Oliveira em 12.06 - este IF dá exceção a partir da segunda execução,
-    //pois na primeira vez retorna undefined, na segunda em diante returna [Function] e entra na exceção
+    //changed by Josenalde Oliveira in 12.06 - this IF statement throws exception after one execution,
+    //since at the first execution it returns undefined, from the second henceforth, it returns [Function] and throws the exception
+    
     // if (Firmata.SYSEX_RESPONSE[commandByte]) {
     //   throw new Error(`${commandByte} is not an available SYSEX_RESPONSE byte`);
     // }

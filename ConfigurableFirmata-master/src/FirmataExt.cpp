@@ -69,15 +69,40 @@ boolean FirmataExt::handleSysex(byte command, byte argc, byte* argv)
       
       pinMode(digitalPin, OUTPUT);
       digitalWrite(digitalPin, pinState);
+     
       Firmata.sendSysex(command, argc, argv); // callback
       
       break;
     }
     case 0x02: { // Analog Read Command
       byte adcPin = argv[0];
-      byte rawAdcReading[1];
-      rawAdcReading[0] = analogRead(adcPin);
-      Firmata.sendSysex(command, argc, rawAdcReading);
+      
+      unsigned short rawV;
+      rawV = analogRead(adcPin); //0-1023
+      // o pino nao precisa voltar ao fw, logo argv será alterado
+      byte i = 0;
+      byte nBytes = rawV / 127;
+      byte lastByte = rawV % 127;
+      //nBytes é o número de bytes de 7 bits CHEIOS e lastByte o que sobra para o próximo byte
+      for (; i<nBytes;i++) {
+        argv[i] = 127;
+      }
+      if (nBytes >= 1) {
+        argv[i] = lastByte;
+      } else argv[i] = rawV;
+
+      argc = i+1;
+   
+      // teste se recebe o pino OK.
+      // if (rawAdcReading[0]  > 500) {
+      //   pinMode(2, OUTPUT);
+      //   digitalWrite(2, HIGH);
+      // } else {
+      //     pinMode(2, OUTPUT);
+      //     digitalWrite(2, LOW);
+      // }
+      // gerar vetor rawAdc dinamico com os pedaços de 127
+      Firmata.sendSysex(command, argc, argv);
       break; 
     }
     case 0x03: { // Digital Read Command
@@ -93,7 +118,20 @@ boolean FirmataExt::handleSysex(byte command, byte argc, byte* argv)
       byte pwmChannel = argv[1];
       byte pwmFreq = argv[2];
       byte pwmResolution = argv[3];
-      byte pwmValue = argv[4];
+      unsigned short pwmValue = 0;
+      
+      for (byte i = 4; i < argc; i++) {
+          pwmValue += argv[i]; //from buffer[4]...
+      }
+      // teste se recebe e reconstroi OK.
+      if (pwmValue == 1020) {
+        pinMode(2, OUTPUT);
+        digitalWrite(2, HIGH);
+      } else {
+          pinMode(2, OUTPUT);
+          digitalWrite(2, LOW);
+      }
+
       ledcSetup(pwmChannel, pwmFreq*1000, pwmResolution);
       ledcAttachPin(pwmPin, pwmChannel);
       ledcWrite(pwmChannel, pwmValue);

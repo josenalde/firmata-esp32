@@ -79,29 +79,21 @@ boolean FirmataExt::handleSysex(byte command, byte argc, byte* argv)
       
       unsigned short rawV;
       rawV = analogRead(adcPin); //0-1023
-      // o pino nao precisa voltar ao fw, logo argv será alterado
+      // pin does not need to callback, therefore argv is modified here
       byte i = 0;
       byte nBytes = rawV / 127;
       byte lastByte = rawV % 127;
-      //nBytes é o número de bytes de 7 bits CHEIOS e lastByte o que sobra para o próximo byte
+      //nBytes is the number of full 7 bit bytes and lastByte is the offset (difference) for the last 7-bit byte
       for (; i<nBytes;i++) {
         argv[i] = 127;
       }
+      // generates dynamic argv with 127 slices
       if (nBytes >= 1) {
         argv[i] = lastByte;
       } else argv[i] = rawV;
 
       argc = i+1;
    
-      // teste se recebe o pino OK.
-      // if (rawAdcReading[0]  > 500) {
-      //   pinMode(2, OUTPUT);
-      //   digitalWrite(2, HIGH);
-      // } else {
-      //     pinMode(2, OUTPUT);
-      //     digitalWrite(2, LOW);
-      // }
-      // gerar vetor rawAdc dinamico com os pedaços de 127
       Firmata.sendSysex(command, argc, argv);
       break; 
     }
@@ -123,15 +115,7 @@ boolean FirmataExt::handleSysex(byte command, byte argc, byte* argv)
       for (byte i = 4; i < argc; i++) {
           pwmValue += argv[i]; //from buffer[4]...
       }
-      // teste se recebe e reconstroi OK.
-      if (pwmValue == 1020) {
-        pinMode(2, OUTPUT);
-        digitalWrite(2, HIGH);
-      } else {
-          pinMode(2, OUTPUT);
-          digitalWrite(2, LOW);
-      }
-
+      
       ledcSetup(pwmChannel, pwmFreq*1000, pwmResolution);
       ledcAttachPin(pwmPin, pwmChannel);
       ledcWrite(pwmChannel, pwmValue);

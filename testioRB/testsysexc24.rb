@@ -3,7 +3,7 @@ require 'arduino_firmata'
 #path C:\Ruby27-x64\lib\ruby\gems\2.7.0\gems\arduino_firmata-0.3.7
 
 
-esp32 = ArduinoFirmata.connect "COM3"
+esp32 = ArduinoFirmata.connect "COM3" #escolher a sua porta (linux ou windows)
 
 rawV = 0 #inicializacao
 dataFwToHw = []
@@ -32,13 +32,15 @@ esp32.on :sysex do |command, data|
       end
       rawV = dataHwToFw # o que recebeu do HW (a leitura em si)
       # parte fixa (pin, level)
-      dataFwToHw.push(pinToWrite)
+      dataFwToHw = [] # é preciso reconstruir ? Até o momento tem funcionado assim (estudar mais sobre variáveis globais em ruby $x). Para evitar reconstruir
+                      # a parte fixa, seria preciso dar o push apenas a partir do índice 4
+      dataFwToHw.push(pinToWrite) #argv[0]
       #Canal: 0 – 15.
-      dataFwToHw.push(channel)
+      dataFwToHw.push(channel) # argv[1]
       #Freq ESP32: 1 – 40MHz.
-      dataFwToHw.push(freq)
+      dataFwToHw.push(freq) #argv[2]
       #Resolution: 1 – 16 bits.
-      dataFwToHw.push(resolution)    
+      dataFwToHw.push(resolution) #argv[3]    
       # parte dinamica
       v = rawV.divmod 127
       #print v[0]
@@ -68,9 +70,9 @@ dataFwToHw.push(resolution)
 
 loop do
    esp32.sysex 0x02, [pinToRead]
-   sleep 0.01 # avaliar estas temporizações - o dado precisa estar disponível para ser enviado!!!
+   sleep 0.15 # avaliar estas temporizações - o dado precisa estar disponível para ser enviado!!!
    esp32.sysex 0x04, dataFwToHw
-   sleep 0.01 #avaliar estas temporizações
+   sleep 0.15 #avaliar estas temporizações
 end
 
 

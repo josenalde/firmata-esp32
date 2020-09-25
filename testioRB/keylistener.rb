@@ -10,5 +10,7 @@ loop do
     # here goes your code
     sleep 0.1 
     puts 'test key listener linux'
-  end
+end
+
+#esp32.close (when 'q' key is pressed, closes the connection)
 
